@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MISTY ATMOSPHERE - Admin Panel</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+  <style>
+    :root {
+      --bg-main: #04060a; --bg-surface: rgba(13, 18, 31, 0.65);
+      --bg-input: rgba(0, 0, 0, 0.4); --border-line: rgba(255, 255, 255, 0.08);
+      --red: #ff2747; --cyan: #00d2ff; --text-main: #f8fafc; --text-muted: #94a3b8;
+      --font-body: 'Plus Jakarta Sans', sans-serif; --font-heading: 'Rajdhani', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background-color: var(--bg-main); color: var(--text-main); padding-bottom: 100px; background-image: radial-gradient(circle at 15% 10%, rgba(255, 39, 71, 0.08), transparent 40%), radial-gradient(circle at 85% 90%, rgba(0, 210, 255, 0.08), transparent 40%); background-attachment: fixed; }
+    .header { background: rgba(4, 6, 10, 0.8); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-line); padding: 20px 0; position: sticky; top: 0; z-index: 100; }
+    .header-content { max-width: 900px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 12px; }
+    .header h1 { font-family: var(--font-heading); font-size: 26px; font-weight: 700; }
+    .header h1 .red { color: var(--red); } .header h1 .cyan { color: var(--cyan); }
+    .container { max-width: 900px; margin: 40px auto; padding: 0 24px; }
+    .card { background: var(--bg-surface); backdrop-filter: blur(20px); border: 1px solid var(--border-line); border-radius: 16px; padding: 32px; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border-line); padding-bottom: 16px; }
+    .card-header i { font-size: 24px; color: var(--cyan); background: rgba(0, 210, 255, 0.1); padding: 8px; border-radius: 10px; }
+    .card-header h2 { font-size: 18px; font-weight: 700; } .card-header p { font-size: 13px; color: var(--text-muted); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: #cbd5e1; }
+    input, select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border-line); color: #fff; padding: 12px 14px; border-radius: 8px; font-family: inherit; font-size: 14px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--cyan); background: rgba(13, 18, 31, 0.9); }
+    .color-wrapper { display: flex; align-items: center; gap: 12px; background: var(--bg-input); border: 1px solid var(--border-line); padding: 8px 16px; border-radius: 10px; }
+    input[type="color"] { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 50%; padding: 0; background: none; cursor: pointer; }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; } input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; }
+    .divider { height: 1px; background: var(--border-line); margin: 24px 0; }
+    .sub-title { font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+    
+    .member-slot { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    .member-slot-title { font-weight: 700; font-size: 14px; margin-bottom: 15px; color: #fff; display: flex; justify-content: space-between;}
+    
+    .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(4, 6, 10, 0.85); backdrop-filter: blur(20px); border-top: 1px solid var(--border-line); padding: 16px 24px; display: flex; justify-content: center; z-index: 999; }
+    .btn-save { background: linear-gradient(135deg, var(--red), #ba0f2a); color: white; font-weight: 700; padding: 14px 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border: none; }
+    
+    @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-content">
+      <h1><span class="red">MISTY</span> <span class="cyan">ADMIN</span></h1>
+    </div>
+  </header>
+
+  <div class="container">
+    <form id="adminForm">
+      
+      <!-- 1. GENERAL -->
+      <div class="card">
+        <div class="card-header"><i class='bx bx-slider-alt'></i><div><h2>Sistem & Pendaftaran</h2></div></div>
+        <div class="form-group" style="margin-bottom: 20px;"><label>Slogan Clan</label><input type="text" id="cfg_slogan"></div>
+        <div class="grid-2">
+          <div class="form-group"><label>WhatsApp Admin</label><input type="number" id="cfg_wa"></div>
+          <div></div> 
+          <div class="form-group">
+            <label>Rekrutmen Competitive</label>
+            <select id="cfg_reg_comp"><option value="true">🟢 BUKA</option><option value="false">🔴 TUTUP</option></select>
+          </div>
+          <div class="form-group">
+            <label>Rekrutmen Fun</label>
+            <select id="cfg_reg_fun"><option value="true">🟢 BUKA</option><option value="false">🔴 TUTUP</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. THEME -->
+      <div class="card">
+        <div class="card-header"><i class='bx bx-palette'></i><div><h2>Tema Profil</h2></div></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Warna Utama (Aksen Merah)</label><div class="color-wrapper"><input type="color" id="cfg_color_primary"><span id="hex_primary">#ff2747</span></div></div>
+          <div class="form-group"><label>Warna Sekunder (Aksen Cyan)</label><div class="color-wrapper"><input type="color" id="cfg_color_secondary"><span id="hex_secondary">#00d2ff</span></div></div>
+        </div>
+      </div>
+
+      <!-- 3. STATS -->
+      <div class="card">
+        <div class="card-header"><i class='bx bx-bar-chart-alt-2'></i><div><h2>Statistik Clan</h2></div></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Anggota Aktif</label><input type="number" id="stat_members"></div>
+          <div class="form-group"><label>Divisi Resmi</label><input type="number" id="stat_divisions"></div>
+          <div class="form-group"><label>Turnamen / FT</label><input type="number" id="stat_tournaments"></div>
+          <div class="form-group"><label>Win Rate (%)</label><input type="number" id="stat_winrate"></div>
+        </div>
+      </div>
+
+      <!-- 4. PENGURUS CLAN (MANAGEMENT) -->
+      <div class="card">
+        <div class="card-header">
+          <i class='bx bx-group'></i>
+          <div>
+            <h2>Manajemen Clan (Pengurus)</h2>
+            <p>Ubah nama, profil, jabatan. Ubah status ke "Sembunyikan" untuk menghapus anggota yang keluar.</p>
+          </div>
+        </div>
+        <div id="membersContainer"></div>
+      </div>
+
+      <!-- 5. ACHIEVEMENTS -->
+      <div class="card">
+        <div class="card-header"><i class='bx bx-trophy'></i><div><h2>Manajemen Prestasi</h2></div></div>
+        
+        <div class="sub-title"><i class='bx bxs-medal' style="color: #f59e0b;"></i> Prestasi 1</div>
+        <div class="grid-2">
+          <div class="form-group"><label>Emoji</label><input type="text" id="ach1_icon"></div>
+          <div class="form-group"><label>Judul</label><input type="text" id="ach1_title"></div>
+          <div class="form-group"><label>Badge Medali</label><input type="text" id="ach1_badge"></div>
+          <div class="form-group"><label>Deskripsi</label><input type="text" id="ach1_desc"></div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="sub-title"><i class='bx bxs-medal' style="color: #94a3b8;"></i> Prestasi 2</div>
+        <div class="grid-2">
+          <div class="form-group"><label>Emoji</label><input type="text" id="ach2_icon"></div>
+          <div class="form-group"><label>Judul</label><input type="text" id="ach2_title"></div>
+          <div class="form-group"><label>Badge Medali</label><input type="text" id="ach2_badge"></div>
+          <div class="form-group"><label>Deskripsi</label><input type="text" id="ach2_desc"></div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="sub-title"><i class='bx bxs-medal' style="color: #cbd5e1;"></i> Prestasi 3</div>
+        <div class="grid-2">
+          <div class="form-group"><label>Emoji</label><input type="text" id="ach3_icon"></div>
+          <div class="form-group"><label>Judul</label><input type="text" id="ach3_title"></div>
+          <div class="form-group"><label>Badge Medali</label><input type="text" id="ach3_badge"></div>
+          <div class="form-group"><label>Deskripsi</label><input type="text" id="ach3_desc"></div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="action-bar">
+    <button type="submit" form="adminForm" class="btn-save" id="saveBtn">
+      <i class='bx bx-save'></i> Simpan Semua Perubahan
+    </button>
+  </div>
+
+  <!-- SCRIPT FIREBASE ASLI ANDA -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    // Konfigurasi asli milik Misty Admin Panel
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwrY26_w0SonsTGRJdeQsnDCPjKwisg-M",
+      authDomain: "misty-admin-panel.firebaseapp.com",
+      projectId: "misty-admin-panel",
+      storageBucket: "misty-admin-panel.firebasestorage.app",
+      messagingSenderId: "511505281780",
+      appId: "1:511505281780:web:fc58f91108de76ef02e4a1",
+      measurementId: "G-600H4ZNLQZ"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const docRef = doc(db, "website", "settings");
+
+    // GENERATE 8 SLOT FORM MEMBER
+    const membersContainer = document.getElementById('membersContainer');
+    const memberTitles = ["1. Founder", "2. Owner", "3. Management", "4. Kapten", "5. Leader Competitive", "6. Co-Leader Competitive", "7. Leader Fun", "8. Co-Leader Fun"];
+    
+    let membersHTML = '';
+    for(let i=1; i<=8; i++) {
+      membersHTML += `
+        <div class="member-slot">
+          <div class="member-slot-title"><span>${memberTitles[i-1]}</span></div>
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Status (Hapus/Tampil)</label>
+              <select id="mem${i}_show">
+                <option value="true">🟢 Tampilkan</option>
+                <option value="false">🔴 Sembunyikan (Hapus)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Nama Nickname</label><input type="text" id="mem${i}_name"></div>
+            <div class="form-group"><label>Nama Jabatan</label><input type="text" id="mem${i}_role"></div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label>Nama File Foto (Cth: founder.png)</label><input type="text" id="mem${i}_img"></div>
+            <div class="form-group"><label>Deskripsi Singkat</label><input type="text" id="mem${i}_desc"></div>
+          </div>
+        </div>
+      `;
+    }
+    membersContainer.innerHTML = membersHTML;
+
+    // EVENT COLORS
+    document.getElementById('cfg_color_primary').addEventListener('input', (e) => document.getElementById('hex_primary').textContent = e.target.value);
+    document.getElementById('cfg_color_secondary').addEventListener('input', (e) => document.getElementById('hex_secondary').textContent = e.target.value);
+
+    // LOAD DATA
+    signInAnonymously(auth).then(async () => {
+      const snap = await getDoc(docRef);
+      if(snap.exists()) {
+        const d = snap.data();
+        document.getElementById('cfg_slogan').value = d.slogan || "Together in the MISTY & Victory in the ATMOSPHERE";
+        document.getElementById('cfg_wa').value = d.wa || "6285701986524";
+        document.getElementById('cfg_reg_comp').value = d.reg_comp ?? "true";
+        document.getElementById('cfg_reg_fun').value = d.reg_fun ?? "true";
+        
+        document.getElementById('cfg_color_primary').value = d.color_primary || "#ff2747";
+        document.getElementById('hex_primary').textContent = d.color_primary || "#ff2747";
+        document.getElementById('cfg_color_secondary').value = d.color_secondary || "#00d2ff";
+        document.getElementById('hex_secondary').textContent = d.color_secondary || "#00d2ff";
+        
+        document.getElementById('stat_members').value = d.stat_members || 26;
+        document.getElementById('stat_divisions').value = d.stat_divisions || 2;
+        document.getElementById('stat_tournaments').value = d.stat_tournaments || 4;
+        document.getElementById('stat_winrate').value = d.stat_winrate || 85;
+
+        for(let i=1; i<=3; i++) {
+          document.getElementById(`ach${i}_icon`).value = d[`ach${i}_icon`] || "";
+          document.getElementById(`ach${i}_title`).value = d[`ach${i}_title`] || "";
+          document.getElementById(`ach${i}_badge`).value = d[`ach${i}_badge`] || "";
+          document.getElementById(`ach${i}_desc`).value = d[`ach${i}_desc`] || "";
+        }
+
+        // Load data members
+        for(let i=1; i<=8; i++) {
+          document.getElementById(`mem${i}_show`).value = d[`mem${i}_show`] ?? "true";
+          document.getElementById(`mem${i}_name`).value = d[`mem${i}_name`] || "";
+          document.getElementById(`mem${i}_role`).value = d[`mem${i}_role`] || "";
+          document.getElementById(`mem${i}_img`).value = d[`mem${i}_img`] || "";
+          document.getElementById(`mem${i}_desc`).value = d[`mem${i}_desc`] || "";
+        }
+      }
+    });
+
+    // SAVE DATA
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Menyimpan...";
+      btn.style.pointerEvents = "none";
+
+      const dataToSave = {
+        slogan: document.getElementById('cfg_slogan').value,
+        wa: document.getElementById('cfg_wa').value,
+        reg_comp: document.getElementById('cfg_reg_comp').value === "true",
+        reg_fun: document.getElementById('cfg_reg_fun').value === "true",
+        color_primary: document.getElementById('cfg_color_primary').value,
+        color_secondary: document.getElementById('cfg_color_secondary').value,
+        stat_members: document.getElementById('stat_members').value,
+        stat_divisions: document.getElementById('stat_divisions').value,
+        stat_tournaments: document.getElementById('stat_tournaments').value,
+        stat_winrate: document.getElementById('stat_winrate').value,
+      };
+
+      for(let i=1; i<=3; i++) {
+        dataToSave[`ach${i}_icon`] = document.getElementById(`ach${i}_icon`).value;
+        dataToSave[`ach${i}_title`] = document.getElementById(`ach${i}_title`).value;
+        dataToSave[`ach${i}_badge`] = document.getElementById(`ach${i}_badge`).value;
+        dataToSave[`ach${i}_desc`] = document.getElementById(`ach${i}_desc`).value;
+      }
+
+      for(let i=1; i<=8; i++) {
+        dataToSave[`mem${i}_show`] = document.getElementById(`mem${i}_show`).value;
+        dataToSave[`mem${i}_name`] = document.getElementById(`mem${i}_name`).value;
+        dataToSave[`mem${i}_role`] = document.getElementById(`mem${i}_role`).value;
+        dataToSave[`mem${i}_img`] = document.getElementById(`mem${i}_img`).value;
+        dataToSave[`mem${i}_desc`] = document.getElementById(`mem${i}_desc`).value;
+      }
+
+      await setDoc(docRef, dataToSave, { merge: true });
+
+      btn.innerHTML = "<i class='bx bx-check'></i> Berhasil Disimpan!";
+      btn.style.background = "#10b981";
+      
+      setTimeout(() => {
+        btn.innerHTML = "<i class='bx bx-save'></i> Simpan Semua Perubahan";
+        btn.style.pointerEvents = "auto";
+        btn.style.background = "linear-gradient(135deg, var(--red), #ba0f2a)";
+      }, 2500);
+    });
+  </script>
+</body>
+</html>
